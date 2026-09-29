@@ -1,0 +1,14 @@
+{
+  "name": "kernel-monitor-server",
+  "version": "1.0.0",
+  "description": "Kernel Monitor backend - reads live CPU, memory, and process stats from /proc and serves them over HTTP.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}

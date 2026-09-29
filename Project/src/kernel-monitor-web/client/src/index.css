@@ -1,0 +1,157 @@
+:root {
+  /* dark (default) */
+  --bg: #0b0f12;
+  --panel: #121820;
+  --panel-raised: #171f28;
+  --border: #232c35;
+  --text: #e8edf1;
+  --text-dim: #9aa5b0;
+  --text-faint: #5b6672;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.18);
+  --grid-line: rgba(255, 255, 255, 0.02);
+
+  --nominal: #4fd1c5;
+  --nominal-dim: #1d3d3a;
+  --warn: #e8a33d;
+  --warn-dim: #3d2f14;
+  --critical: #e8556b;
+  --critical-dim: #3d1922;
+  --info: #7aa2f7;
+
+  --font-sans: "IBM Plex Sans", -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+  --radius: 8px;
+  --radius-sm: 5px;
+  --row-py: 10px;
+  --content-pad: 24px;
+  color-scheme: dark;
+}
+
+[data-density="compact"] {
+  --row-py: 5px;
+  --content-pad: 16px;
+}
+
+:root[data-theme="light"] {
+  --bg: #f5f6f7;
+  --panel: #ffffff;
+  --panel-raised: #fbfbfc;
+  --border: #e1e4e8;
+  --text: #1b232b;
+  --text-dim: #5b6672;
+  --text-faint: #99a2ab;
+  --shadow: 0 1px 2px rgba(20, 30, 40, 0.06), 0 6px 16px rgba(20, 30, 40, 0.06);
+  --grid-line: rgba(20, 30, 40, 0.035);
+
+  --nominal: #0f9c8f;
+  --nominal-dim: #d7f3ef;
+  --warn: #b5730a;
+  --warn-dim: #fbecd4;
+  --critical: #cf3854;
+  --critical-dim: #fbe0e4;
+  --info: #3f66c9;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+h1, h2, h3 { font-family: var(--font-sans); margin: 0; font-weight: 600; }
+
+.mono { font-family: var(--font-mono); }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 12.5px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  border: 1px solid var(--border);
+  background: var(--panel-raised);
+  color: var(--text-dim);
+  transition: all 0.15s ease;
+}
+.btn:hover { border-color: var(--text-faint); color: var(--text); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary {
+  background: var(--nominal-dim);
+  color: var(--nominal);
+  border-color: var(--nominal);
+}
+.btn-primary:hover { filter: brightness(1.08); color: var(--nominal); }
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--panel-raised);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.icon-btn:hover { color: var(--text); border-color: var(--text-faint); }
+
+::selection { background: var(--nominal-dim); color: var(--text); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+button, input, select { font-family: inherit; }
+a { color: var(--nominal); }
+
+:focus-visible { outline: 2px solid var(--nominal); outline-offset: 2px; }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--nominal);
+  cursor: pointer;
+  box-shadow: 0 0 0 3px var(--nominal-dim);
+}
+
+table { border-collapse: collapse; }
+.km-row { transition: background-color 0.12s ease; }
+.km-row:hover { background: var(--panel-raised) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

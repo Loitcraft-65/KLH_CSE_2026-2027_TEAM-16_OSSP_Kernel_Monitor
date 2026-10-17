@@ -1,0 +1,26 @@
+Section 43: Simulated documentation and data points.
+Section 31: Simulated documentation and data points.
+Section 88: Simulated documentation and data points.
+Section 42: Simulated documentation and data points.
+Section 28: Simulated documentation and data points.
+Section 23: Simulated documentation and data points.
+Section 14: Simulated documentation and data points.
+Section 78: Simulated documentation and data points.
+
+// TARGET NEEDLE: OSSP_THREAD_BENCHMARK_TARGET [INDEX 328]
+Section 69: Simulated documentation and data points.
+Section 77: Simulated documentation and data points.
+Section 60: Simulated documentation and data points.
+Section 61: Simulated documentation and data points.
+Section 31: Simulated documentation and data points.
+Section 54: Simulated documentation and data points.
+Section 85: Simulated documentation and data points.
+Section 41: Simulated documentation and data points.
+Section 70: Simulated documentation and data points.
+Section 44: Simulated documentation and data points.
+Section 99: Simulated documentation and data points.
+Section 30: Simulated documentation and data points.
+Section 44: Simulated documentation and data points.
+Section 84: Simulated documentation and data points.
+Section 66: Simulated documentation and data points.
+Section 92: Simulated documentation and data points.

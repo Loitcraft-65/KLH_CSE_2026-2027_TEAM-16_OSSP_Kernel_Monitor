@@ -1,0 +1,14 @@
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #4253
+[DEBUG] [WorkerPool] Active threads: 16, Pending queue tasks: 35
+[INFO] [Thread-6] Successfully processed chunk 3107 in 30ms
+[INFO] [Thread-4] Successfully processed chunk 9114 in 43ms
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #9027
+[DEBUG] [WorkerPool] Active threads: 8, Pending queue tasks: 38
+[DEBUG] [WorkerPool] Active threads: 16, Pending queue tasks: 64
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #6163
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #527
+
+// TARGET NEEDLE: OSSP_THREAD_BENCHMARK_TARGET [INDEX 118]
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[INFO] [Thread-10] Successfully processed chunk 2087 in 26ms
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #1807

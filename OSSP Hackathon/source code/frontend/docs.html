@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroSearch - Official Project Documentation | Team 16</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #0284c7;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --paper: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #0f172a;
+      --code-text: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Newsreader', Georgia, serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 17px;
+      padding: 40px 20px;
+    }
+
+    /* Fixed Top Action Bar for UI */
+    .action-bar {
+      position: fixed;
+      top: 16px;
+      right: 24px;
+      display: flex;
+      gap: 12px;
+      z-index: 1000;
+    }
+
+    .btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .btn-primary {
+      background: #0284c7;
+      color: white;
+      border: none;
+    }
+    .btn-primary:hover {
+      background: #0369a1;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #0f172a;
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    /* Document Container */
+    .document-page {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--paper);
+      padding: 72px 80px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    /* Cover Page */
+    .cover-page {
+      text-align: center;
+      padding-bottom: 80px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 60px;
+    }
+
+    .hackathon-badge {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #0284c7;
+      background: #e0f2fe;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+
+    .cover-title {
+      font-size: 38px;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.25;
+      margin-bottom: 16px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .cover-subtitle {
+      font-size: 20px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+
+    .team-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      max-width: 620px;
+      margin: 0 auto 40px;
+      text-align: left;
+    }
+
+    .team-header {
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .team-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+    }
+
+    .team-table th {
+      color: var(--text-muted);
+      text-align: left;
+      padding: 6px 12px;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .team-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #edf2f7;
+    }
+
+    .team-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .meta-box {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Headings & Content Typography */
+    h1, h2, h3, h4 {
+      font-family: 'Inter', sans-serif;
+      color: var(--primary);
+      margin-top: 48px;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    h1 { font-size: 28px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+    h2 { font-size: 22px; }
+    h3 { font-size: 18px; }
+
+    p {
+      margin-bottom: 18px;
+      text-align: justify;
+    }
+
+    /* Callout Alert */
+    .callout {
+      background: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      padding: 16px 20px;
+      margin: 24px 0;
+      border-radius: 0 8px 8px 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+    }
+
+    /* Tables */
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+    }
+
+    .report-table th {
+      background: #0f172a;
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .report-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .report-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* Code Blocks */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 18px 22px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      margin: 20px 0;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* Diagram Card */
+    .diagram-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin: 24px 0;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      overflow-x: auto;
+    }
+
+    .diagram-card pre {
+      background: transparent;
+      color: #0f172a;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+
+    /* Table of Contents */
+    .toc {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 32px;
+      margin: 36px 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .toc h3 {
+      margin-top: 0;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+
+    .toc ul {
+      list-style: none;
+    }
+
+    .toc li {
+      padding: 6px 0;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dotted #cbd5e1;
+      font-size: 14px;
+    }
+
+    .toc a {
+      color: #0284c7;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        font-size: 12pt;
+      }
+      .action-bar {
+        display: none !important;
+      }
+      .document-page {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+      h1, h2 {
+        page-break-after: avoid;
+      }
+      pre, table {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Action Buttons -->
+  <div class="action-bar">
+    <a href="/" class="btn btn-secondary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Search App
+    </a>
+    <a href="PROJECT_DOCUMENTATION.docx" download="PROJECT_DOCUMENTATION_TEAM_16.docx" class="btn btn-secondary" style="background: #f0fdf4; border-color: #86efac; color: #166534;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Download DOCX
+    </a>
+    <button onclick="window.print()" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+      Print / Save as PDF
+    </button>
+  </div>
+
+  <main class="document-page">
+
+    <!-- Cover Page -->
+    <section class="cover-page">
+      <div class="hackathon-badge">OSSP Hackathon 2026 Project Report</div>
+      <h1 class="cover-title">AeroSearch: High-Performance Parallel File Search Engine</h1>
+      <p class="cover-subtitle">Dynamic Producer-Consumer Concurrency using POSIX Threads & Real-Time Telemetry</p>
+
+      <div class="team-card">
+        <div class="team-header">
+          <span>PROJECT SUBMISSION</span>
+          <span style="color: #0284c7;">TEAM - 16</span>
+        </div>
+        <table class="team-table">
+          <thead>
+            <tr>
+              <th>Team Member</th>
+              <th>Roll / Reg. Number</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Lohith Sanapala</strong></td>
+              <td><code>2520030023</code></td>
+              <td>C Core & Task Queue Concurrency</td>
+            </tr>
+            <tr>
+              <td><strong>Saahas Vaddi</strong></td>
+              <td><code>2520030256</code></td>
+              <td>FastAPI Bridge & Amdahl Benchmarking</td>
+            </tr>
+            <tr>
+              <td><strong>Rapaka Rithwik</strong></td>
+              <td><code>2520030427</code></td>
+              <td>Frontend HUD & Data Generator</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="meta-box">
+        <strong>Repository:</strong> <code>e:/OSSP-Hackathon</code> &bull; 
+        <strong>Core Basis:</strong> Native C (POSIX Threads / GCC 16.2.0) &bull; 
+        <strong>Submission Date:</strong> October 2026
+      </div>
+    </section>
+
+    <!-- Table of Contents -->
+    <nav class="toc" aria-label="Table of Contents">
+      <h3>Table of Contents</h3>
+      <ul>
+        <li><a href="#ch1">1. Abstract & Executive Summary</a> <span>Page 1</span></li>
+        <li><a href="#ch2">2. Problem Statement & Motivation</a> <span>Page 2</span></li>
+        <li><a href="#ch3">3. System Architecture & Component Design</a> <span>Page 3</span></li>
+        <li><a href="#ch4">4. Concurrency Model & OS Synchronization</a> <span>Page 4</span></li>
+        <li><a href="#ch5">5. Deep Content Matching & I/O Optimization</a> <span>Page 5</span></li>
+        <li><a href="#ch6">6. Empirical Benchmarks & Amdahl's Law</a> <span>Page 6</span></li>
+        <li><a href="#ch7">7. Technical Challenges & Resolutions</a> <span>Page 7</span></li>
+        <li><a href="#ch8">8. Execution Manual & Verification</a> <span>Page 8</span></li>
+      </ul>
+    </nav>
+
+    <!-- Chapter 1 -->
+    <section id="ch1" class="page-break">
+      <h1>1. Abstract & Executive Summary</h1>
+      <p>
+        In modern computing systems, storage capacities and directory depths continue to expand exponentially, yet everyday search utilities frequently execute file traversal sequentially. Sequential file search underutilizes multi-core microprocessor capabilities, resulting in idle CPU cycles and extended user latency during deep directory crawls.
+      </p>
+      <p>
+        <strong>AeroSearch</strong> is an end-to-end, high-concurrency file traversal and full-text pattern matching engine designed for the OSSP Hackathon. The computational foundation of the project is implemented entirely in <strong>C using POSIX Threads (<code>pthreads</code>)</strong>. To eliminate the thread starvation common in static partitioning, AeroSearch develops a dynamic work-stealing task queue coordinated by fine-grained mutual exclusion locks (<code>pthread_mutex_t</code>) and condition variables (<code>pthread_cond_t</code>).
+      </p>
+      <div class="callout">
+        <strong>Key Metric Achieved:</strong> Benchmarks across an 800-file nested directory demonstrate that AeroSearch scales from <strong>99.87 ms (1 Thread)</strong> down to <strong>35.67 ms (4 Threads)</strong>, achieving an empirical <strong>2.80x speedup</strong> and processing over <strong>22,400 files/second</strong> before saturating system I/O buses.
+      </div>
+    </section>
+
+    <!-- Chapter 2 -->
+    <section id="ch2">
+      <h1>2. Problem Statement & Motivation</h1>
+      <p>
+        Standard command-line utilities such as basic <code>find</code> or single-threaded recursive <code>grep</code> algorithms examine the file system sequentially. When scanning directories containing tens of thousands of mixed source code files, logs, and binaries:
+      </p>
+      <ol style="margin-left: 24px; margin-bottom: 18px;">
+        <li style="margin-bottom: 8px;"><strong>I/O Blocking:</strong> While a single thread waits for disk blocks to be transferred into memory buffers, the processor remains in an I/O wait state.</li>
+        <li style="margin-bottom: 8px;"><strong>Unbalanced Subtrees:</strong> Subdirectories in software repositories are fundamentally asymmetrical. For example, a <code>node_modules</code> or <code>logs</code> folder may contain 15,000 files, while a sibling <code>config</code> folder contains only 3. Naive static thread division leads to severe load imbalance.</li>
+        <li style="margin-bottom: 8px;"><strong>Lack of Observability:</strong> Typical search CLI tools operate as black boxes, providing no live telemetry on active worker threads, per-core throughput, or real-time progress.</li>
+      </ol>
+      <p>
+        The objective of Team 16 was to construct a robust, production-grade parallel search platform combining low-level C concurrency with a real-time web interface.
+      </p>
+    </section>
+
+    <!-- Chapter 3 -->
+    <section id="ch3" class="page-break">
+      <h1>3. System Architecture & Component Design</h1>
+      <p>
+        The platform operates on a three-tier decoupling architecture:
+      </p>
+
+      <div class="diagram-card">
+<pre>
++-------------------------------------------------------------------------+
+|                        Frontend (Browser UI)                            |
+|   - Real-time Concurrency HUD (Active Worker Cards, File Counters)      |
+|   - Results Explorer (Filename & Full-Text Content Matches)             |
+|   - Canvas 2D Benchmark Visualizer (Speedup vs. Amdahl's Law Curve)     |
++-----------------------------------^-------------------------------------+
+                                    | WebSocket (JSON stream, 16-30 FPS)
++-----------------------------------v-------------------------------------+
+|                      FastAPI Server (Python 3.14)                       |
+|   - Subprocess Pipe Bridge (c_bridge.py)                                |
+|   - Concurrency Benchmark Suite Runner (benchmark.py)                   |
+|   - Procedural Test Dataset Generator (data_gen.py)                     |
++-----------------------------------^-------------------------------------+
+                                    | Async stdio (Non-blocking pipes)
++-----------------------------------v-------------------------------------+
+|              Native C Core Search Engine (POSIX Threads)                |
+|   +-----------------------------------------------------------------+   |
+|   |                  Thread-Safe Task Queue                         |   |
+|   |         (pthread_mutex_t lock, pthread_cond_t not_empty)        |   |
+|   +-------------------------------+---------------------------------+   |
+|                                   | Pull Tasks                          |
+|         +-------------------------+-------------------------+           |
+|         v                         v                         v           |
+|    Worker Thread #0          Worker Thread #1          Worker Thread #N |
+|   [Directory Traversal]     [Directory Traversal]     [Content Grep]    |
++-------------------------------------------------------------------------+
+</pre>
+      </div>
+
+      <h2>Tier Descriptions</h2>
+      <p>
+        <strong>1. Computational Core (C Engine):</strong> A statically linked standalone binary (<code>parallel_search.exe</code>) compiled with <code>gcc -Wall -Wextra -O3 -static</code>. It performs all directory entry querying (<code>opendir</code>, <code>readdir</code>), file chunk reading, and regex/substring comparisons.
+      </p>
+      <p>
+        <strong>2. Orchestration Bridge (FastAPI):</strong> Spawns the C engine as an asynchronous child process using <code>asyncio.create_subprocess_exec</code>. Real-time telemetry JSON lines output by C are parsed and broadcast immediately over WebSockets.
+      </p>
+      <p>
+        <strong>3. Cyber-Industrial Frontend:</strong> A responsive, zero-build web interface (HTML5, Vanilla CSS, Canvas 2D) rendering worker status cards, dynamic line-number highlights, and Amdahl's Law scaling charts.
+      </p>
+    </section>
+
+    <!-- Chapter 4 -->
+    <section id="ch4" class="page-break">
+      <h1>4. Concurrency Model & OS Synchronization</h1>
+      
+      <h2>4.1 Dynamic Producer-Consumer Task Queue</h2>
+      <p>
+        The queue is defined in <code>c_engine/queue.h</code> as a linked FIFO queue holding two task types: <code>TASK_DIRECTORY</code> and <code>TASK_FILE</code>.
+      </p>
+      <pre><code>typedef struct Task {
+    char path[MAX_PATH_LEN];
+    TaskType type; // TASK_DIRECTORY or TASK_FILE
+    int depth;
+    struct Task* next;
+} Task;
+
+typedef struct {
+    Task* head;
+    Task* tail;
+    int count;
+    int active_workers;
+    bool shutdown;
+    pthread_mutex_t lock;
+    pthread_cond_t not_empty;
+} TaskQueue;</code></pre>
+
+      <h2>4.2 Synchronization Primitives & Deadlock Prevention</h2>
+      <p>
+        Worker threads interact through strict synchronization invariants:
+      </p>
+      <ul style="margin-left: 24px; margin-bottom: 18px;">
+        <li><strong>Mutual Exclusion:</strong> The queue lock (<code>q->lock</code>) is acquired only during rapid pointer manipulation and counter increments, minimizing critical section duration.</li>
+        <li><strong>Condition Signaling:</strong> When the queue is empty, worker threads execute <code>pthread_cond_wait(&q->not_empty, &q->lock)</code>. Threads surrender their time slice to the operating system scheduler rather than spinning in CPU-wasting loops.</li>
+        <li><strong>Atomic Termination Guarantee:</strong> A worker thread exiting cannot simply check <code>q->count == 0</code>, because sibling threads may be traversing subdirectories and about to enqueue more files. The system terminates cleanly if and only if:
+        $$\text{Shutdown} \iff (\text{queue\_count} == 0) \land (\text{active\_workers} == 0)$$
+        When both conditions hold, <code>q->shutdown = true</code> is set, and <code>pthread_cond_broadcast(&q->not_empty)</code> awakens all threads to exit safely.</li>
+      </ul>
+    </section>
+
+    <!-- Chapter 5 -->
+    <section id="ch5">
+      <h1>5. Deep Content Matching & I/O Optimization</h1>
+      <p>
+        The content search subsystem in <code>c_engine/search.c</code> implements several key performance heuristics:
+      </p>
+      <ul style="margin-left: 24px; margin-bottom: 18px;">
+        <li><strong>Null-Byte Binary Detection:</strong> The first 1,024 bytes of every candidate file are inspected. If any null byte (<code>\0</code>) is discovered, the file is identified as a binary artifact (e.g., compiled object files, executables, images) and skipped, avoiding gigabytes of irrelevant regex processing.</li>
+        <li><strong>Buffered File Scanning:</strong> Files are read using buffered I/O streams with line-by-line boundary tracking.</li>
+        <li><strong>Context Snippet & Line Extraction:</strong> When a substring match is found, the exact line number and surrounding text snippet are extracted and escaped into JSON.</li>
+        <li><strong>Independent Telemetry Locks:</strong> Each thread maintains an isolated <code>WorkerTelemetry</code> struct with its own mutex, preventing telemetry logging from becoming a lock contention point.</li>
+      </ul>
+    </section>
+
+    <!-- Chapter 6 -->
+    <section id="ch6" class="page-break">
+      <h1>6. Empirical Benchmarks & Amdahl's Law</h1>
+
+      <h2>6.1 Theoretical Amdahl's Law Formulation</h2>
+      <p>
+        Amdahl's Law models the theoretical maximum speedup $S(n)$ achievable by adding parallel processors:
+      </p>
+      <p style="text-align: center; font-size: 20px; margin: 20px 0;">
+        $$S(n) = \frac{1}{(1 - P) + \frac{P}{n}}$$
+      </p>
+      <p>
+        Where $P$ is the parallelizable proportion of execution (file content grep and directory scanning) and $(1 - P)$ is the strictly serial portion (initial thread spawning, CLI argument parsing, file queue locking). For AeroSearch, profiling indicates $P \approx 0.88$.
+      </p>
+
+      <h2>6.2 Measured Performance on 800-File Test Dataset</h2>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Thread Count ($n$)</th>
+            <th>Execution Time ($T_n$)</th>
+            <th>Empirical Speedup ($S_n$)</th>
+            <th>Efficiency ($E_n$)</th>
+            <th>Amdahl Speedup ($P=0.88$)</th>
+            <th>Throughput (Files/sec)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1 Thread</strong></td>
+            <td>99.87 ms</td>
+            <td>1.00x</td>
+            <td>100.0%</td>
+            <td>1.00x</td>
+            <td>8,010 files/s</td>
+          </tr>
+          <tr>
+            <td><strong>2 Threads</strong></td>
+            <td>64.04 ms</td>
+            <td>1.56x</td>
+            <td>78.0%</td>
+            <td>1.79x</td>
+            <td>12,492 files/s</td>
+          </tr>
+          <tr>
+            <td><strong>4 Threads</strong></td>
+            <td><strong>35.67 ms</strong></td>
+            <td><strong>2.80x</strong></td>
+            <td><strong>70.0%</strong></td>
+            <td>2.94x</td>
+            <td><strong>22,427 files/s</strong></td>
+          </tr>
+          <tr>
+            <td><strong>8 Threads</strong></td>
+            <td>46.34 ms</td>
+            <td>2.16x</td>
+            <td>27.0%</td>
+            <td>4.35x</td>
+            <td>17,263 files/s</td>
+          </tr>
+          <tr>
+            <td><strong>16 Threads</strong></td>
+            <td>42.93 ms</td>
+            <td>2.33x</td>
+            <td>14.6%</td>
+            <td>5.71x</td>
+            <td>18,635 files/s</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        <strong>Analysis:</strong> Optimal execution occurs at <strong>4 worker threads</strong>, where throughput reaches 22,427 files/sec. Moving beyond 8 threads introduces operating system thread context-switching overhead and disk I/O queue saturation, demonstrating standard hardware bus limits.
+      </p>
+    </section>
+
+    <!-- Chapter 7 -->
+    <section id="ch7">
+      <h1>7. Technical Challenges & Resolutions</h1>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th style="width: 28%;">Challenge</th>
+            <th style="width: 32%;">Root Cause</th>
+            <th>Engineering Resolution</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Missing DLLs on Host</strong></td>
+            <td>MinGW dynamically links <code>libwinpthread-1.dll</code> by default.</td>
+            <td>Statically linked runtime libraries using <code>-static</code> to produce a 100% self-contained binary.</td>
+          </tr>
+          <tr>
+            <td><strong>Windows Path Backslash Escaping</strong></td>
+            <td>JSON decoders crash when encountering raw backslashes (<code>\</code>).</td>
+            <td>Built an in-place C sanitizer (<code>escape_json</code>) converting backslashes to forward slashes.</td>
+          </tr>
+          <tr>
+            <td><strong>Browser Event Saturation</strong></td>
+            <td>Streaming every single scanned file over WebSockets froze browser rendering.</td>
+            <td>Added a decoupled 60ms interval reporter thread in C to pulse aggregated telemetry.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Chapter 8 -->
+    <section id="ch8" class="page-break">
+      <h1>8. Execution Manual & Verification</h1>
+      
+      <h2>Starting the Application</h2>
+      <pre><code># Launch unified server and open browser:
+python run.py</code></pre>
+      <p>
+        The server starts at <code>http://127.0.0.1:8000/</code>. The browser opens automatically, pre-populated with the generated test dataset.
+      </p>
+
+      <h2>Running Standalone C Engine</h2>
+      <pre><code># Multi-threaded terminal search:
+./c_engine/parallel_search.exe -d ./test_dataset -p "HACKATHON_CHAMPION_2026" -t 8
+
+# Real-time JSON stream output:
+./c_engine/parallel_search.exe -d ./test_dataset -p "queue" -t 4 --stream</code></pre>
+
+      <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-muted);">
+        <div>OSSP Hackathon &bull; Team - 16</div>
+        <div>Lohith Sanapala &bull; Saahas Vaddi &bull; Rapaka Rithwik</div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

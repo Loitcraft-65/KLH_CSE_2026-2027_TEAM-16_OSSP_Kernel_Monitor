@@ -1,0 +1,14 @@
+# Architecture Specification
+This module implements a dynamic work-stealing thread queue.
+# Architecture Specification
+This module implements a dynamic work-stealing thread queue.
+const handleSearchQuery = async (query) => {
+  const res = await fetch(`/api/search?q=${query}`);
+  return res.json();
+};
+// High concurrency mutex synchronization block
+pthread_mutex_lock(&lock);
+shared_resource++;
+pthread_mutex_unlock(&lock);
+def calculate_speedup(t1, tn):
+    return t1 / tn if tn > 0 else 0.0

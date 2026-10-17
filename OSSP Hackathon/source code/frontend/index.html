@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroSearch | Parallel Multi-Threaded File Search Engine (C Core)</title>
+  <meta name="description" content="High-performance parallel file search engine utilizing POSIX threads, work-stealing queue architecture, and real-time telemetry.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top HUD Header -->
+    <header class="app-header glass">
+      <div class="brand-wrapper">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div class="brand-titles">
+          <h1>AeroSearch Parallel Engine</h1>
+          <div class="brand-subtitle">
+            <span class="c-badge" id="engineBadge">C POSIX THREADS</span>
+            <span id="systemCoresInfo">Detecting hardware cores...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btnOpenGenData" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          Generate Test Data
+        </button>
+
+        <button id="btnOpenBenchmark" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          Run Benchmark
+        </button>
+        <a href="docs.html" target="_blank" class="btn btn-secondary" title="View Full Academic Documentation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          Documentation
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Search Control Panel -->
+    <section class="control-panel glass" aria-label="Search Controls">
+      <div class="search-main-row">
+        <!-- Directory Input -->
+        <div class="input-group">
+          <label for="inputDir">Search Directory</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <input type="text" id="inputDir" class="text-input" placeholder="e.g. E:/OSSP-Hackathon or ./test_dataset" spellcheck="false">
+          </div>
+        </div>
+
+        <!-- Pattern Query Input -->
+        <div class="input-group">
+          <label for="inputPattern">Search Query (Keyword or Wildcard)</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="inputPattern" class="text-input" placeholder="e.g. queue, mutex, HACKATHON_CHAMPION_2026..." spellcheck="false">
+          </div>
+        </div>
+
+        <!-- Thread Count Selector -->
+        <div class="input-group">
+          <label for="selectThreads">Threads</label>
+          <select id="selectThreads" class="select-input">
+            <option value="1">1 Thread</option>
+            <option value="2">2 Threads</option>
+            <option value="4" selected>4 Threads</option>
+            <option value="8">8 Threads</option>
+            <option value="12">12 Threads</option>
+            <option value="16">16 Threads</option>
+            <option value="32">32 Threads</option>
+          </select>
+        </div>
+
+        <!-- Search / Cancel Button -->
+        <div class="search-btn-wrapper">
+          <button id="btnSearch" class="btn btn-primary search-btn">
+            <svg id="searchIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span id="searchBtnText">Start Search</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Secondary Search Options -->
+      <div class="search-options-row">
+        <div class="options-switches">
+          <label class="checkbox-label">
+            <input type="checkbox" id="chkSearchContent" checked>
+            <span>Search Inside File Content</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chkSearchName" checked>
+            <span>Match File Names</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="chkCaseSensitive">
+            <span>Case Sensitive</span>
+          </label>
+        </div>
+
+        <div class="filters-extra">
+          <div class="input-group" style="flex-direction: row; align-items: center; gap: 8px;">
+            <label for="inputExts" style="margin: 0;">Ext Filter:</label>
+            <input type="text" id="inputExts" class="filter-chip-input" placeholder=".c,.h,.py,.txt,.log">
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Tokens Bar -->
+      <div class="quick-tokens-bar">
+        <span>Suggested Test Queries:</span>
+        <span class="token-chip" data-query="queue">queue</span>
+        <span class="token-chip" data-query="pthread">pthread</span>
+        <span class="token-chip" data-query="mutex">mutex</span>
+        <span class="token-chip" data-query="HACKATHON_CHAMPION_2026">HACKATHON_CHAMPION_2026</span>
+        <span class="token-chip" data-query="DATABASE_DEADLOCK_DETECTED">DATABASE_DEADLOCK_DETECTED</span>
+      </div>
+    </section>
+
+    <!-- Concurrency Telemetry HUD -->
+    <section class="concurrency-section" aria-label="Thread Pool Telemetry">
+      <div class="section-header">
+        <div class="section-title">
+          <div id="pulseIndicator" class="pulse-dot idle"></div>
+          <span>Thread Pool Worker Telemetry</span>
+        </div>
+
+        <div class="metrics-summary-bar">
+          <div class="metric-pill">
+            <span class="label">Files Scanned:</span>
+            <span id="metricFiles" class="value">0</span>
+          </div>
+          <div class="metric-pill">
+            <span class="label">Matches Found:</span>
+            <span id="metricMatches" class="value highlight">0</span>
+          </div>
+          <div class="metric-pill">
+            <span class="label">Elapsed:</span>
+            <span id="metricTime" class="value">0.0 ms</span>
+          </div>
+          <div class="metric-pill">
+            <span class="label">Throughput:</span>
+            <span id="metricThroughput" class="value">0 f/s</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Dynamic Threads Grid -->
+      <div id="threadsGrid" class="threads-grid">
+        <!-- Thread Cards populated by JavaScript dynamically -->
+      </div>
+    </section>
+
+    <!-- Live Results Explorer Section -->
+    <section class="results-section glass" aria-label="Search Results">
+      <div class="results-toolbar">
+        <div class="results-filter-tabs">
+          <button class="filter-tab active" data-filter="all">All Results (<span id="countAll">0</span>)</button>
+          <button class="filter-tab" data-filter="content">Content Matches (<span id="countContent">0</span>)</button>
+          <button class="filter-tab" data-filter="name">Filename Matches (<span id="countName">0</span>)</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <input type="text" id="inputTableFilter" class="filter-chip-input" style="width: 200px;" placeholder="Filter displayed results...">
+          
+          <button id="btnExportJson" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+            Export JSON
+          </button>
+          <button id="btnExportCsv" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="results-table-container">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th style="width: 90px;">Thread</th>
+              <th style="width: 100px;">Type</th>
+              <th>File Path</th>
+              <th style="width: 70px;">Line</th>
+              <th>Matched Content / Context Snippet</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTableBody">
+            <!-- Results inserted here -->
+            <tr id="emptyRow">
+              <td colspan="5">
+                <div class="empty-state">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <p>Ready to search. Select a directory and enter a keyword above.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- MODAL: Multi-Thread Benchmark Suite -->
+  <div id="benchmarkModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          Multi-Thread Concurrency Benchmark
+        </h3>
+        <button id="btnCloseBenchmark" class="modal-close-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted);">
+          Benchmarks parallel execution times across 1, 2, 4, 8, and 16 C POSIX threads on the active target directory.
+          Computes empirical speedup curve vs. Amdahl's Law theoretical limit.
+        </p>
+
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <button id="btnRunBenchmarkAction" class="btn btn-primary" style="padding: 8px 16px;">
+            Run Benchmark Now
+          </button>
+          <span id="benchmarkStatusText" style="font-size: 13px; color: var(--accent-cyan);"></span>
+        </div>
+
+        <!-- Canvas Chart Container -->
+        <div class="chart-container">
+          <canvas id="benchmarkChartCanvas"></canvas>
+        </div>
+
+        <!-- Benchmark Comparison Table -->
+        <table class="benchmark-table">
+          <thead>
+            <tr>
+              <th>Threads</th>
+              <th>Time (ms)</th>
+              <th>Speedup</th>
+              <th>Efficiency</th>
+              <th>Amdahl Speedup</th>
+              <th>Throughput</th>
+            </tr>
+          </thead>
+          <tbody id="benchmarkTableBody">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-dim); padding: 18px;">
+                Click "Run Benchmark Now" to calculate thread scaling.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Mock Data Generator -->
+  <div id="genDataModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          Generate Sample Test Dataset
+        </h3>
+        <button id="btnCloseGenData" class="modal-close-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted);">
+          Instantly generate a simulated folder hierarchy with hundreds of realistic source code, JSON configs, markdown guides, and server logs containing hidden search tokens.
+        </p>
+
+        <div class="input-group">
+          <label for="inputGenCount">File Count to Generate</label>
+          <select id="selectGenCount" class="select-input">
+            <option value="400">400 Files (Fast Demo)</option>
+            <option value="800" selected>800 Files (Standard Benchmark)</option>
+            <option value="1500">1,500 Files (Heavy Workload)</option>
+            <option value="3000">3,000 Files (Stress Test)</option>
+          </select>
+        </div>
+
+        <button id="btnCreateDatasetAction" class="btn btn-primary" style="width: 100%; justify-content: center;">
+          Generate Dataset Now
+        </button>
+
+        <div id="genDataResultArea" style="display: none; padding: 14px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--border-subtle); font-size: 12px;">
+          <div style="color: var(--accent-emerald); font-weight: 700; margin-bottom: 8px;" id="genDataSuccessMsg"></div>
+          <p style="color: var(--text-muted); margin-bottom: 6px;">Target Directory automatically set to test_dataset. Injected tokens:</p>
+          <div id="genInjectedTokens" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="benchmark_chart.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

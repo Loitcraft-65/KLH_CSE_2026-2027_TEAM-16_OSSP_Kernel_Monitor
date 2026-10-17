@@ -1,0 +1,13 @@
+
+// TARGET NEEDLE: QUANTUM_CONCURRENCY_KEY [INDEX 138]
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #5265
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #7765
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #9201
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #6269
+[INFO] [Thread-14] Successfully processed chunk 608 in 24ms
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #7085
+[DEBUG] [WorkerPool] Active threads: 8, Pending queue tasks: 108
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[DEBUG] [WorkerPool] Active threads: 4, Pending queue tasks: 118
+[DEBUG] [WorkerPool] Active threads: 4, Pending queue tasks: 68

@@ -1,0 +1,9 @@
+[DEBUG] [WorkerPool] Active threads: 16, Pending queue tasks: 22
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[INFO] [Thread-10] Successfully processed chunk 9485 in 25ms
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #1519
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #924
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[INFO] [Thread-0] Successfully processed chunk 9137 in 12ms
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #5595
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #8759

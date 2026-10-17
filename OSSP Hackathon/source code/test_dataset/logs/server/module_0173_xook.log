@@ -1,0 +1,21 @@
+[INFO] [Thread-0] Successfully processed chunk 5748 in 11ms
+[INFO] [Thread-14] Successfully processed chunk 8678 in 28ms
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #7546
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #9009
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #4498
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #8554
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #5273
+[DEBUG] [WorkerPool] Active threads: 4, Pending queue tasks: 27
+[INFO] [Thread-12] Successfully processed chunk 6098 in 2ms
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #6786
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #9102
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #2108
+[DEBUG] [WorkerPool] Active threads: 16, Pending queue tasks: 104
+[DEBUG] [WorkerPool] Active threads: 4, Pending queue tasks: 32
+[INFO] [Thread-3] Successfully processed chunk 1458 in 3ms
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[DEBUG] [WorkerPool] Active threads: 16, Pending queue tasks: 116
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[DEBUG] [WorkerPool] Active threads: 4, Pending queue tasks: 88

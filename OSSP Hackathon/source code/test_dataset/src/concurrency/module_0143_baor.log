@@ -1,0 +1,7 @@
+[INFO] [Thread-5] Successfully processed chunk 686 in 28ms
+[DEBUG] [WorkerPool] Active threads: 8, Pending queue tasks: 78
+[DEBUG] [WorkerPool] Active threads: 2, Pending queue tasks: 15
+[INFO] [Thread-5] Successfully processed chunk 3010 in 35ms
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #3932
+[DEBUG] [WorkerPool] Active threads: 4, Pending queue tasks: 85
+[INFO] [Thread-1] Successfully processed chunk 211 in 33ms

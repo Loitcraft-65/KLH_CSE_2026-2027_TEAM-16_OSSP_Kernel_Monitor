@@ -1,0 +1,8 @@
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[DEBUG] [WorkerPool] Active threads: 8, Pending queue tasks: 64
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #3751
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #7347
+[WARN] [I/O-Scheduler] Cache hit ratio 94.2% on block #1484
+[INFO] [Telemetry] Core temperature normal, CPU load across cores balanced

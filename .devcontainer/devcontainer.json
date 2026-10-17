@@ -1,0 +1,24 @@
+{
+  "name": "AeroSearch Parallel File Search (Team 16)",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "postCreateCommand": "cd 'OSSP Hackathon/source code/c_engine' && make && cd .. && pip install -r backend/requirements.txt",
+  "postStartCommand": "nohup python 'OSSP Hackathon/source code/run.py' > /tmp/aerosearch.log 2>&1 &",
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": {
+      "label": "AeroSearch Web App",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-python.python"
+      ]
+    }
+  }
+}

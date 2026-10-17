@@ -1,5 +1,8 @@
 # AeroSearch: Parallel Multi-Threaded File Search Engine
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Loitcraft-65/KLH_CSE_2026-2027_TEAM-16_OSSP_Kernel_Monitor)
+[![Run AeroSearch Parallel Benchmarks](https://github.com/Loitcraft-65/KLH_CSE_2026-2027_TEAM-16_OSSP_Kernel_Monitor/actions/workflows/run_benchmark.yml/badge.svg)](https://github.com/Loitcraft-65/KLH_CSE_2026-2027_TEAM-16_OSSP_Kernel_Monitor/actions/workflows/run_benchmark.yml)
+
 A high-concurrency file search engine built on a **C POSIX Threads** core, connected via **FastAPI WebSocket Streaming** to an **Interactive Cyber-Industrial Web UI**.
 
 Developed for the **OSSP Hackathon** under the topic **"Parallel File Search using Threads"**.
@@ -11,7 +14,7 @@ Developed for the **OSSP Hackathon** under the topic **"Parallel File Search usi
 | **Saahas Vaddi** | **2520030256** |
 | **Rapaka Rithwik** | **2520030427** |
 
-📖 **Full Academic Project Documentation**: See [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for in-depth operating system design, queue theory, mathematical Amdahl's Law derivation, and empirical benchmarks.
+📖 **Full Academic Project Documentation**: See [PROJECT_DOCUMENTATION.docx](PROJECT_DOCUMENTATION.docx) (Word) or [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) for in-depth operating system design, queue theory, mathematical Amdahl's Law derivation, and empirical benchmarks.
 
 ---
 

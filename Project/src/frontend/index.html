@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Kernel Monitor | Ring-0 Subsystems & Low-Level Telemetry</title>
+    <meta name="description" content="Real-time Linux Ring-0 Kernel Subsystem & Performance Telemetry Dashboard for OSSP 25CS2104E.">
+    <!-- Google Fonts: Outfit (modern display) & JetBrains Mono (precision telemetry) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Ambient Aurora Lighting Effects -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <div class="app-layout">
+        <!-- Top Navigation & Kernel Status Bar -->
+        <header class="top-header">
+            <div class="brand-section">
+                <div class="brand-logo" id="brand-logo" title="Kernel Monitor Ring-0 Core">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" stroke="#00f2fe" stroke-width="2"/>
+                        <path d="M12 6v6l4 2" stroke="#38bdf8" stroke-linecap="round"/>
+                        <circle cx="12" cy="12" r="2.5" fill="#f43f5e"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand-title-wrap">
+                        <h1 class="brand-title">LINUX KERNEL MONITOR</h1>
+                        <span class="brand-tag">RING-0 TELEMETRY</span>
+                    </div>
+                    <p class="brand-subtitle">Subsystem Telemetry: CPU Scheduler &bull; SLAB Caches &bull; MMU Faults &bull; VFS &bull; kthreads</p>
+                </div>
+            </div>
+
+            <!-- Header Controls & Metadata -->
+            <div class="header-metadata">
+                <div class="meta-pill" title="Active Linux Kernel Version">
+                    <span class="meta-icon">🐧</span>
+                    <span class="meta-label">KERNEL:</span>
+                    <span id="meta-kernel" class="meta-value mono">Detecting...</span>
+                </div>
+                <div class="meta-pill" title="Continuous Kernel Uptime">
+                    <span class="meta-icon">⏱️</span>
+                    <span class="meta-label">UPTIME:</span>
+                    <span id="meta-uptime" class="meta-value mono">0s</span>
+                </div>
+                <div class="connection-status" id="conn-status" title="WebSocket Live Stream Status">
+                    <span class="pulse-dot"></span>
+                    <span id="conn-text">STREAMING (1Hz)</span>
+                </div>
+                <button class="header-btn" id="btn-toggle-stream" title="Pause or Resume Live Telemetry Stream">
+                    <span id="icon-stream">⏸️</span>
+                    <span id="text-stream">Pause</span>
+                </button>
+                <button class="header-btn btn-highlight" id="btn-open-arch" title="View Kernel Architecture, Subsystems & Student Responsibilities">
+                    <span>📖 Architecture Guide</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Content -->
+        <main class="dashboard-body">
+
+            <!-- Subsystem Health Summary Bar -->
+            <section class="health-strip" id="health-strip">
+                <div class="health-summary-badge">
+                    <div class="health-gauge">
+                        <span class="health-score-val mono" id="health-score">98%</span>
+                    </div>
+                    <div>
+                        <div class="health-status-title">KERNEL SUBSYSTEMS HEALTH</div>
+                        <div class="health-status-desc" id="health-overall-desc">All Ring-0 subsystems operating within normal parameters.</div>
+                    </div>
+                </div>
+
+                <div class="subsystem-indicators">
+                    <div class="subsystem-item" id="health-sched" title="CPU Scheduler execution, context switches and runqueue">
+                        <span class="sub-dot ok"></span>
+                        <span class="sub-name">Scheduler</span>
+                        <span class="sub-val mono">Optimal</span>
+                    </div>
+                    <div class="subsystem-item" id="health-mem" title="Kernel SLAB cache, page tables, and kernel stacks">
+                        <span class="sub-dot ok"></span>
+                        <span class="sub-name">SLAB Memory</span>
+                        <span class="sub-val mono">Normal</span>
+                    </div>
+                    <div class="subsystem-item" id="health-vm" title="MMU virtual memory page faults & disk page-ins">
+                        <span class="sub-dot ok"></span>
+                        <span class="sub-name">MMU Paging</span>
+                        <span class="sub-val mono">Stable</span>
+                    </div>
+                    <div class="subsystem-item" id="health-vfs" title="Virtual File System dentries, inodes, and file descriptors">
+                        <span class="sub-dot ok"></span>
+                        <span class="sub-name">VFS Tables</span>
+                        <span class="sub-val mono">Nominal</span>
+                    </div>
+                    <div class="subsystem-item" id="health-irq" title="Hardware interrupts, Inter-Processor Interrupts (RES/CAL) and SoftIRQs">
+                        <span class="sub-dot ok"></span>
+                        <span class="sub-name">Interrupts</span>
+                        <span class="sub-val mono">Active</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Telemetry Stat Cards Grid -->
+            <section class="stat-cards-grid">
+                <!-- Stat 1: Ring-0 Kernel Mode CPU -->
+                <div class="stat-card" id="card-cpu-kernel">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="card-subsystem">CPU SCHEDULER</span>
+                            <span class="card-friendly-title">Kernel CPU Mode</span>
+                        </div>
+                        <div class="card-badges">
+                            <span class="card-badge badge-ring0">RING-0</span>
+                            <span class="status-pill pill-ok" id="badge-status-cpu">Normal</span>
+                        </div>
+                    </div>
+                    <div class="card-metric">
+                        <span class="metric-val mono" id="val-kernel-cpu">0.0</span>
+                        <span class="metric-unit">%</span>
+                        <div class="metric-explain" title="Percentage of CPU execution cycles consumed strictly by kernel-space code (system calls, scheduler, driver handlers) versus user applications.">
+                            <span class="info-icon">ℹ️</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="footer-detail">User (Ring-3): <strong id="val-user-cpu" class="mono">0.0%</strong></span>
+                        <span class="footer-detail">I/O Wait: <strong id="val-iowait" class="mono">0.0%</strong></span>
+                    </div>
+                    <div class="metric-progress-bg">
+                        <div class="metric-progress-bar bar-crimson" id="bar-kernel-cpu" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Stat 2: Kernel Context Switches Rate -->
+                <div class="stat-card" id="card-ctxt">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="card-subsystem">SCHEDULER DISPATCH</span>
+                            <span class="card-friendly-title">Context Switches</span>
+                        </div>
+                        <div class="card-badges">
+                            <span class="card-badge">/proc/stat</span>
+                            <span class="status-pill pill-ok" id="badge-status-ctxt">Optimal</span>
+                        </div>
+                    </div>
+                    <div class="card-metric">
+                        <span class="metric-val mono" id="val-ctxt-rate">0</span>
+                        <span class="metric-unit">ctxt/s</span>
+                        <div class="metric-explain" title="Rate at which the kernel scheduler switches execution from one task thread to another. Flags scheduling churn and preemption overhead.">
+                            <span class="info-icon">ℹ️</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="footer-detail">Runnable: <strong id="val-runnable" class="mono">0 tasks</strong></span>
+                        <span class="footer-detail">Blocked: <strong id="val-blocked" class="mono">0</strong></span>
+                    </div>
+                    <div class="metric-progress-bg">
+                        <div class="metric-progress-bar bar-purple" id="bar-ctxt" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Stat 3: Kernel SLAB Cache -->
+                <div class="stat-card" id="card-slab">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="card-subsystem">SLAB ALLOCATOR</span>
+                            <span class="card-friendly-title">Kernel SLAB Objects</span>
+                        </div>
+                        <div class="card-badges">
+                            <span class="card-badge">/proc/meminfo</span>
+                            <span class="status-pill pill-ok" id="badge-status-slab">Normal</span>
+                        </div>
+                    </div>
+                    <div class="card-metric">
+                        <span class="metric-val mono" id="val-slab-mb">0</span>
+                        <span class="metric-unit">MB</span>
+                        <div class="metric-explain" title="Physical RAM allocated to internal kernel data structures (dentries, inodes, buffer heads, socket buffers). Includes reclaimable caches.">
+                            <span class="info-icon">ℹ️</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="footer-detail">Reclaimable: <strong id="val-slab-rec" class="mono">0 MB</strong></span>
+                        <span class="footer-detail">SLAB/RAM: <strong id="val-slab-ratio" class="mono">0.0%</strong></span>
+                    </div>
+                    <div class="metric-progress-bg">
+                        <div class="metric-progress-bar bar-emerald" id="bar-slab" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Stat 4: Interrupts & Rescheduling IPIs -->
+                <div class="stat-card" id="card-intr">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="card-subsystem">INTERRUPT CONTROLLER</span>
+                            <span class="card-friendly-title">Inter-Core IPIs</span>
+                        </div>
+                        <div class="card-badges">
+                            <span class="card-badge">/proc/interrupts</span>
+                            <span class="status-pill pill-ok" id="badge-status-intr">Active</span>
+                        </div>
+                    </div>
+                    <div class="card-metric">
+                        <span class="metric-val mono" id="val-res-ipis">0</span>
+                        <span class="metric-unit">RES IPI</span>
+                        <div class="metric-explain" title="Rescheduling Inter-Processor Interrupts dispatched across CPU cores to wake sleeping cores or balance thread workloads.">
+                            <span class="info-icon">ℹ️</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="footer-detail">Calls (CAL): <strong id="val-cal-ipis" class="mono">0</strong></span>
+                        <span class="footer-detail">TLB Shoots: <strong id="val-tlb" class="mono">0</strong></span>
+                    </div>
+                    <div class="metric-progress-bg">
+                        <div class="metric-progress-bar bar-cyan" id="bar-intr" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Stat 5: VFS Kernel Caches -->
+                <div class="stat-card" id="card-vfs">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <span class="card-subsystem">VFS CACHES</span>
+                            <span class="card-friendly-title">Filesystem Dentries</span>
+                        </div>
+                        <div class="card-badges">
+                            <span class="card-badge">/proc/sys/fs</span>
+                            <span class="status-pill pill-ok" id="badge-status-vfs">Healthy</span>
+                        </div>
+                    </div>
+                    <div class="card-metric">
+                        <span class="metric-val mono" id="val-dentry-count">0</span>
+                        <span class="metric-unit">dentries</span>
+                        <div class="metric-explain" title="Directory Entry cache mapping directory paths to filesystem inodes in kernel memory for instant file lookup without disk access.">
+                            <span class="info-icon">ℹ️</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="footer-detail">Inodes: <strong id="val-inode-count" class="mono">0</strong></span>
+                        <span class="footer-detail">Open Files: <strong id="val-file-alloc" class="mono">0</strong></span>
+                    </div>
+                    <div class="metric-progress-bg">
+                        <div class="metric-progress-bar bar-amber" id="bar-vfs" style="width: 0%"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alerts Banner Area -->
+            <section class="alerts-banner" id="alerts-banner">
+                <div class="alert-icon-box">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="12" y1="9" x2="12" y2="13" stroke-linecap="round"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title-row">
+                        <strong id="alert-summary-title">KERNEL SUBSYSTEMS STATUS OPTIMAL</strong>
+                        <span class="badge" id="alert-counter-badge">0 Alerts Active</span>
+                    </div>
+                    <p id="alert-summary-desc">Ring-0 scheduler dispatch, SLAB caches, MMU page faulting, and VFS file tables are within operating limits.</p>
+                </div>
+                <button class="alert-action-btn" id="btn-alert-review" title="Jump to Threshold Rules">Review Rules</button>
+            </section>
+
+            <!-- Charts Section (2x2 Grid) with Enhanced Header & Controls -->
+            <section class="charts-section-wrap">
+                <div class="section-title-bar">
+                    <div>
+                        <h2 class="section-heading">Kernel Subsystem Telemetry Waveforms</h2>
+                        <span class="section-subheading">Continuous 1Hz time-series telemetry with sliding history</span>
+                    </div>
+                    <div class="chart-controls-group">
+                        <button class="chart-time-btn active" data-points="30" id="btn-time-30s">30s Window</button>
+                        <button class="chart-time-btn" data-points="60" id="btn-time-60s">60s Window</button>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <!-- Chart 1: CPU Execution Rings -->
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <div class="chart-title-group">
+                                <span class="dot-indicator dot-crimson"></span>
+                                <div>
+                                    <h3>CPU Execution Rings</h3>
+                                    <span class="chart-subtitle">Ring-0 Kernel Space (System %) vs Ring-3 User (%) vs I/O Wait</span>
+                                </div>
+                            </div>
+                            <span class="chart-metric-tag mono" id="tag-sched-load">Load: 0.00</span>
+                        </div>
+                        <div class="chart-canvas-wrap">
+                            <canvas id="chart-cpu"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Context Switches -->
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <div class="chart-title-group">
+                                <span class="dot-indicator dot-purple"></span>
+                                <div>
+                                    <h3>Scheduler Context Switches</h3>
+                                    <span class="chart-subtitle">Task Preemption Frequency (ctxt/sec) & Rescheduling IPIs</span>
+                                </div>
+                            </div>
+                            <span class="chart-metric-tag mono" id="tag-forks">Forks: 0</span>
+                        </div>
+                        <div class="chart-canvas-wrap">
+                            <canvas id="chart-ctxt"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 3: Kernel Memory Breakdown -->
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <div class="chart-title-group">
+                                <span class="dot-indicator dot-emerald"></span>
+                                <div>
+                                    <h3>Kernel Memory Footprint</h3>
+                                    <span class="chart-subtitle">SLAB Allocator, MMU PageTables & Kernel Thread Stacks</span>
+                                </div>
+                            </div>
+                            <span class="chart-metric-tag mono" id="tag-slab-pct">Slab: 0.0%</span>
+                        </div>
+                        <div class="chart-canvas-wrap">
+                            <canvas id="chart-mem"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 4: Virtual Memory MMU Faults -->
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <div class="chart-title-group">
+                                <span class="dot-indicator dot-amber"></span>
+                                <div>
+                                    <h3>Virtual Memory MMU Faults</h3>
+                                    <span class="chart-subtitle">Minor Page Faults (Soft/RAM) vs Major Disk Page-Ins/sec</span>
+                                </div>
+                            </div>
+                            <span class="chart-metric-tag mono" id="tag-pgmajfault">MajFaults: 0/s</span>
+                        </div>
+                        <div class="chart-canvas-wrap">
+                            <canvas id="chart-vm"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom Tabs: Kernel Threads vs Tunables vs SoftIRQs vs Logs -->
+            <section class="details-section">
+                <div class="tabs-nav-container">
+                    <div class="tabs-nav">
+                        <button class="tab-btn active" data-tab="tab-kthreads">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+                            <span>Kernel Threads (kthreads)</span>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-tunables">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            <span>Kernel Tunables (sysctl) & Thresholds</span>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-softirqs">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            <span>Traps & SoftIRQs</span>
+                        </button>
+                        <button class="tab-btn" data-tab="tab-logs">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                            <span>Kernel Audit Log</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab 1: Kernel Threads Table -->
+                <div class="tab-pane active" id="tab-kthreads">
+                    <div class="kthread-header-row">
+                        <div>
+                            <h3 class="pane-title">Ring-0 Kernel Threads Inspection</h3>
+                            <p class="pane-subtitle">Evaluates PID, PPID (kthreadd PID 2), context switches and execution state of kernel-space daemon threads.</p>
+                        </div>
+                        <div class="chip-filters" id="kthread-chip-filters">
+                            <button class="chip active" data-filter="">All Threads</button>
+                            <button class="chip" data-filter="kworker">kworker</button>
+                            <button class="chip" data-filter="rcu">rcu</button>
+                            <button class="chip" data-filter="ksoftirqd">ksoftirqd</button>
+                            <button class="chip" data-filter="migration">migration</button>
+                        </div>
+                    </div>
+
+                    <div class="table-toolbar">
+                        <div class="search-input-wrap">
+                            <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="text" id="kthread-search" class="search-input" placeholder="Search by name, PID, or function (e.g. kworker, rcu, migration)...">
+                            <button class="search-clear-btn" id="btn-clear-search" title="Clear Search">&times;</button>
+                        </div>
+                        <span class="table-count mono" id="kthread-count-label">Scanning kernel threads...</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="telemetry-table">
+                            <thead>
+                                <tr>
+                                    <th title="Process Identifier">PID</th>
+                                    <th title="Parent Process ID (kthreadd PID 2 is root of all kernel threads)">PARENT PID</th>
+                                    <th title="Privilege Level: Ring-0 Kernel Space (No user virtual memory address space)">EXEC LEVEL</th>
+                                    <th title="Thread Kernel Function Name">KERNEL THREAD NAME</th>
+                                    <th title="Voluntary yields when waiting for an I/O or sleep event">VOLUNTARY YIELDS</th>
+                                    <th title="Scheduler involuntary preemptions when time-slice expired">PREEMPTIONS</th>
+                                    <th title="Kernel task state: S (Interruptible Sleep), R (Running), D (Disk Sleep)">STATE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kthreads-tbody">
+                                <tr><td colspan="7" class="loading-cell">Scanning ring-0 kernel threads...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Kernel Tunables & Thresholds -->
+                <div class="tab-pane" id="tab-tunables">
+                    <div class="thresholds-container">
+                        <div class="thresholds-header">
+                            <div>
+                                <h3 class="pane-title">Kernel Sysctl Tunables & Alert Threshold Rules</h3>
+                                <p class="pane-subtitle">Live kernel parameters from /proc/sys/vm & /proc/sys/kernel with dynamic rule configuration.</p>
+                            </div>
+                            <div class="preset-buttons-group">
+                                <span class="preset-label">Presets:</span>
+                                <button class="btn-preset" id="preset-default">Standard</button>
+                                <button class="btn-preset" id="preset-server">High-Load Server</button>
+                                <button class="btn-preset" id="preset-strict">Strict Auditing</button>
+                                <button id="btn-save-thresholds" class="btn-primary">Apply & Save Rules</button>
+                            </div>
+                        </div>
+
+                        <!-- Sysctl Cards -->
+                        <div class="tunables-cards-row">
+                            <div class="tunable-card">
+                                <div class="tunable-card-top">
+                                    <span class="tunable-label">vm.vfs_cache_pressure</span>
+                                    <span class="tunable-tag">VFS</span>
+                                </div>
+                                <span class="tunable-val mono" id="val-sysctl-vfs">100</span>
+                                <span class="tunable-desc">Aggressiveness of kernel dentry and inode memory reclamation (100 = balanced).</span>
+                            </div>
+                            <div class="tunable-card">
+                                <div class="tunable-card-top">
+                                    <span class="tunable-label">vm.swappiness</span>
+                                    <span class="tunable-tag">MMU</span>
+                                </div>
+                                <span class="tunable-val mono" id="val-sysctl-swap">60</span>
+                                <span class="tunable-desc">Kernel preference to swap anonymous application memory to disk (0 = avoid, 100 = aggressive).</span>
+                            </div>
+                            <div class="tunable-card">
+                                <div class="tunable-card-top">
+                                    <span class="tunable-label">vm.dirty_ratio</span>
+                                    <span class="tunable-tag">PAGE CACHE</span>
+                                </div>
+                                <span class="tunable-val mono" id="val-sysctl-dirty">20%</span>
+                                <span class="tunable-desc">Percentage of system memory filled with dirty pages before kernel pdflush forces writeback.</span>
+                            </div>
+                            <div class="tunable-card">
+                                <div class="tunable-card-top">
+                                    <span class="tunable-label">kernel.pid_max</span>
+                                    <span class="tunable-tag">SCHED</span>
+                                </div>
+                                <span class="tunable-val mono" id="val-sysctl-pidmax">4194304</span>
+                                <span class="tunable-desc">Maximum process and kernel thread identifier ceiling supported by the kernel scheduler.</span>
+                            </div>
+                        </div>
+
+                        <!-- Threshold Rule Sliders -->
+                        <form id="form-thresholds" class="thresholds-grid">
+                            <div class="threshold-field">
+                                <div class="threshold-field-header">
+                                    <label for="th-kernel-cpu">Ring-0 Kernel CPU Limit</label>
+                                    <span class="mono slider-val" id="val-th-kernel-cpu">30%</span>
+                                </div>
+                                <div class="slider-group">
+                                    <input type="range" id="th-kernel-cpu" min="10" max="90" step="5" value="30">
+                                </div>
+                                <span class="field-hint">Triggers an alert when excessive CPU execution time is spent inside kernel mode.</span>
+                            </div>
+
+                            <div class="threshold-field">
+                                <div class="threshold-field-header">
+                                    <label for="th-ctxt">Context Switch Rate Limit</label>
+                                    <span class="mono slider-val" id="val-th-ctxt">15000/s</span>
+                                </div>
+                                <div class="slider-group">
+                                    <input type="range" id="th-ctxt" min="2000" max="50000" step="1000" value="15000">
+                                </div>
+                                <span class="field-hint">Flags excessive scheduler thread switching and CPU preemption churn.</span>
+                            </div>
+
+                            <div class="threshold-field">
+                                <div class="threshold-field-header">
+                                    <label for="th-slab">Kernel SLAB Limit (% of RAM)</label>
+                                    <span class="mono slider-val" id="val-th-slab">20%</span>
+                                </div>
+                                <div class="slider-group">
+                                    <input type="range" id="th-slab" min="5" max="50" step="1" value="20">
+                                </div>
+                                <span class="field-hint">Alerts when internal kernel object caches consume more than this fraction of physical RAM.</span>
+                            </div>
+
+                            <div class="threshold-field">
+                                <div class="threshold-field-header">
+                                    <label for="th-pgfault">Minor Page Fault Limit</label>
+                                    <span class="mono slider-val" id="val-th-pgfault">8000/s</span>
+                                </div>
+                                <div class="slider-group">
+                                    <input type="range" id="th-pgfault" min="1000" max="30000" step="500" value="8000">
+                                </div>
+                                <span class="field-hint">Detects rapid virtual memory address space mapping overhead.</span>
+                            </div>
+
+                            <div class="threshold-field">
+                                <div class="threshold-field-header">
+                                    <label for="th-pgmajfault">Major Page Fault Limit</label>
+                                    <span class="mono slider-val" id="val-th-pgmajfault">50/s</span>
+                                </div>
+                                <div class="slider-group">
+                                    <input type="range" id="th-pgmajfault" min="5" max="200" step="5" value="50">
+                                </div>
+                                <span class="field-hint">Alerts on severe paging thrashing requiring synchronous disk reads.</span>
+                            </div>
+
+                            <div class="threshold-field">
+                                <div class="threshold-field-header">
+                                    <label for="th-vfs">VFS File Handle Limit</label>
+                                    <span class="mono slider-val" id="val-th-vfs">75%</span>
+                                </div>
+                                <div class="slider-group">
+                                    <input type="range" id="th-vfs" min="20" max="95" step="5" value="75">
+                                </div>
+                                <span class="field-hint">Flags exhaustion of system-wide kernel file descriptor tables (`fs.file-max`).</span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Traps & SoftIRQs -->
+                <div class="tab-pane" id="tab-softirqs">
+                    <div class="pane-header-wrap">
+                        <h3 class="pane-title">Kernel Traps & Bottom-Half SoftIRQs</h3>
+                        <p class="pane-subtitle">Inspects deferred interrupt handlers executing in kernel context to prevent hardware interrupt latency.</p>
+                    </div>
+                    <div class="softirqs-grid">
+                        <div class="softirq-card">
+                            <div class="softirq-card-top">
+                                <span class="softirq-name">SCHED SOFTIRQ</span>
+                                <span class="softirq-badge">SCHEDULER</span>
+                            </div>
+                            <span class="softirq-val mono" id="val-softirq-sched">0</span>
+                            <span class="softirq-desc">Scheduler fair queue rebalance & multi-core load balancing daemon events.</span>
+                        </div>
+                        <div class="softirq-card">
+                            <div class="softirq-card-top">
+                                <span class="softirq-name">RCU SOFTIRQ</span>
+                                <span class="softirq-badge">LOCKLESS SYNC</span>
+                            </div>
+                            <span class="softirq-val mono" id="val-softirq-rcu">0</span>
+                            <span class="softirq-desc">Read-Copy Update quiescent state checks and memory reclaim callbacks.</span>
+                        </div>
+                        <div class="softirq-card">
+                            <div class="softirq-card-top">
+                                <span class="softirq-name">TIMER SOFTIRQ</span>
+                                <span class="softirq-badge">TIMERS</span>
+                            </div>
+                            <span class="softirq-val mono" id="val-softirq-timer">0</span>
+                            <span class="softirq-desc">High-resolution timer wheel execution and scheduler jiffies ticks.</span>
+                        </div>
+                        <div class="softirq-card">
+                            <div class="softirq-card-top">
+                                <span class="softirq-name">NET_RX SOFTIRQ</span>
+                                <span class="softirq-badge">NETWORKING</span>
+                            </div>
+                            <span class="softirq-val mono" id="val-softirq-net">0</span>
+                            <span class="softirq-desc">Network packet receive polling (NAPI) from network interface cards.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Kernel Audit Log -->
+                <div class="tab-pane" id="tab-logs">
+                    <div class="logs-header">
+                        <div>
+                            <h3 class="pane-title">Persistent Kernel Subsystem Audit Log</h3>
+                            <span class="mono log-path-sub">Audit File: logs/kernel_monitor.log</span>
+                        </div>
+                        <div class="log-actions-group">
+                            <div class="log-filter-chips">
+                                <button class="chip active" id="btn-log-all">All</button>
+                                <button class="chip" id="btn-log-warn">Warnings</button>
+                                <button class="chip" id="btn-log-crit">Critical</button>
+                            </div>
+                            <button id="btn-copy-logs" class="btn-secondary" title="Copy log contents to clipboard">📋 Copy</button>
+                            <button id="btn-refresh-logs" class="btn-secondary">🔄 Refresh</button>
+                        </div>
+                    </div>
+                    <pre class="terminal-log-viewer" id="log-viewer">Fetching recent logs...</pre>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-left">
+                <span class="footer-title">LINUX KERNEL MONITOR</span>
+                <span class="footer-course">Operating Systems & Systems Programming (25CS2104E) &bull; Team 16</span>
+            </div>
+            <div class="footer-right">
+                <span>Lohith Sanapala (C Collector) &bull; Saahas Vaddi (Backend & API) &bull; Rithwik Rapaka (Visualisation)</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Architecture & Guide Modal -->
+    <div class="modal-backdrop" id="arch-modal" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h2 class="modal-title">Linux Kernel Subsystem Architecture Guide</h2>
+                    <span class="modal-subtitle">OSSP 25CS2104E &bull; Team 16 Telemetry Architecture</span>
+                </div>
+                <button class="modal-close-btn" id="btn-close-arch">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="guide-section">
+                    <div class="guide-badge-row">
+                        <span class="guide-badge">RING-0 PRIVILEGE LEVEL</span>
+                        <span class="guide-badge badge-c">C DATA COLLECTOR</span>
+                        <span class="guide-badge badge-py">FASTAPI & WEBSOCKET</span>
+                    </div>
+                    <h3>Why This Is a "Kernel Subsystem Monitor" (Not a Task Manager)</h3>
+                    <p>Standard tools like Windows Task Manager or Linux <code>top</code> focus on user-space applications (PID memory, window titles). This project inspects the internal machinery of the <strong>Linux Kernel (Ring-0)</strong>:</p>
+                    <ul class="guide-list">
+                        <li><strong>CPU Scheduler Subsystem:</strong> Separates Kernel Space (<code>system</code>) from User Space (<code>user</code>), tracking context switch frequency and runnable task queues.</li>
+                        <li><strong>SLAB Allocator & Memory:</strong> Inspects physical RAM consumed by the kernel object cache (<code>SReclaimable</code>, <code>SUnreclaim</code>, page tables, kernel stacks).</li>
+                        <li><strong>Virtual Memory MMU Faults:</strong> Differentiates between soft RAM minor faults and severe disk major faults (paging thrashing).</li>
+                        <li><strong>Virtual File System (VFS):</strong> Tracks allocated kernel file handles against the system-wide ceiling and monitors the dentry cache.</li>
+                        <li><strong>Kernel Threads (kthreads):</strong> Identifies genuine Ring-0 threads spawned from <code>kthreadd</code> (PID 2) that run without user virtual memory.</li>
+                    </ul>
+                </div>
+
+                <div class="guide-section">
+                    <h3>Team Responsibilities</h3>
+                    <div class="team-cards-grid">
+                        <div class="team-card">
+                            <div class="team-roll mono">2520030023</div>
+                            <div class="team-name">Lohith Sanapala</div>
+                            <div class="team-role">Kernel-Level C Collector Module</div>
+                            <p class="team-desc">Low-level <code>/proc</code> parsers, <code>sysinfo()</code>, <code>getrusage()</code> system calls, and kernel thread discovery.</p>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-roll mono">2520030256</div>
+                            <div class="team-name">Saahas Vaddi</div>
+                            <div class="team-role">Backend Service, API & Database</div>
+                            <p class="team-desc">FastAPI REST endpoints, 1Hz WebSocket streaming, SQLite time-series storage, and C process bridge.</p>
+                        </div>
+                        <div class="team-card">
+                            <div class="team-roll mono">2520030427</div>
+                            <div class="team-name">Rithwik Rapaka</div>
+                            <div class="team-role">Visualisation & Alerting Logic</div>
+                            <p class="team-desc">Real-time telemetry dashboard, dynamic Chart.js waveforms, threshold rules engine, and subsystem health indicators.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="btn-close-arch-action">Got It, Return to Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="/static/js/charts.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

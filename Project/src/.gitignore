@@ -1,0 +1,39 @@
+# ============================================================================
+# Git Ignore - Linux Kernel Monitor (OSSP 25CS2104E)
+# ============================================================================
+
+# C build & object files
+collector/src/*.o
+*.o
+*.obj
+*.so
+*.dylib
+*.a
+
+# Compiled binaries
+kernel_collector
+
+# Python bytecode & virtualenvs
+__pycache__/
+backend/app/__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Database files & generated runtime logs
+logs/*.db
+*.sqlite3
+
+# IDE / Editor configuration
+.vscode/
+.idea/
+*.suo
+*.user
+*.swp
+*~
+
+# Operating System temporary files
+.DS_Store
+Thumbs.db
